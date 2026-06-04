@@ -574,8 +574,6 @@ if __name__ == "__main__":
             timeout=30,
             long_polling_timeout=30,
             skip_pending=True,
-            request_connect_timeout=30,
-            request_read_timeout=30,
             allowed_updates=['message']
         )
         
