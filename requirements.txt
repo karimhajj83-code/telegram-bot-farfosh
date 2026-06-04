@@ -1,0 +1,23 @@
+# Telegram Bot API
+pyTelegramBotAPI==4.20.0
+
+# Google Gemini AI - Latest stable version
+google-generativeai==0.7.2
+
+# Image Processing
+Pillow==10.1.0
+
+# Text to Speech
+gTTS==2.4.0
+
+# HTTP Requests
+requests==2.31.0
+
+# Environment Variables Management
+python-dotenv==1.0.0
+
+# Utilities
+six==1.16.0
+idna==3.6
+urllib3==2.1.0
+certifi==2023.7.22
