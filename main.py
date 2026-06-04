@@ -11,10 +11,13 @@ from datetime import datetime
 import json
 import time
 import threading
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Try to load environment variables from .env file (for local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Configure logging
 logging.basicConfig(
@@ -26,26 +29,35 @@ logger = logging.getLogger(__name__)
 # ==================== CONFIGURATION ====================
 
 # Bot token - سحب من متغيرات البيئة (Environment Variables)
+# في Render.com، تأكد من إضافة TELEGRAM_TOKEN في صفحة Environment
 BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 # التحقق من وجود البوت توكن
 if not BOT_TOKEN:
     logger.error("❌ CRITICAL ERROR: TELEGRAM_TOKEN not found in environment variables!")
-    logger.error("❌ يرجى إضافة TELEGRAM_TOKEN في ملف .env أو في متغيرات البيئة")
-    logger.error("❌ Example: TELEGRAM_TOKEN=8471634275:AAFKFFXTpJn1ZuzViUXgGxhf_MIv367mXuc")
+    logger.error("❌ Please add TELEGRAM_TOKEN in your environment or .env file")
+    logger.error("❌ Example: TELEGRAM_TOKEN=1234567890:AAFKFFXTpJn1ZuzViUXgGxhf_MIv367mXuc")
     sys.exit(1)
 
 # Initialize bot
-bot = telebot.TeleBot(BOT_TOKEN, parse_mode='HTML')
+try:
+    bot = telebot.TeleBot(BOT_TOKEN, parse_mode='HTML')
+    logger.info("✅ Telegram Bot initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize bot: {str(e)}")
+    sys.exit(1)
 
 # Configure Gemini API - سحب من متغيرات البيئة
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    logger.info("✅ Gemini API configured successfully")
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+        logger.info("✅ Gemini API configured successfully")
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to configure Gemini API: {str(e)}")
 else:
-    logger.warning("⚠️ GEMINI_API_KEY environment variable not set - some features will be limited")
+    logger.warning("⚠️ GEMINI_API_KEY environment variable not set - AI features will be limited")
 
 # System prompt for Farfosh personality
 SYSTEM_PROMPT = """أنت بوت تليجرام اسمه "فرفوش" وأنت صديق بشري متقلب المزاج بطريقة كوميدية ومضحكة جداً جداً.
@@ -258,7 +270,10 @@ def start_command(message):
         logger.info(f"🚀 Start command from user {message.from_user.id} ({message.from_user.first_name})")
     except Exception as e:
         logger.error(f"❌ Error in start command: {str(e)}")
-        bot.reply_to(message, "خلل تقني! 😤")
+        try:
+            bot.reply_to(message, "خلل تقني! 😤")
+        except:
+            pass
 
 @bot.message_handler(commands=['image'])
 def image_command(message):
@@ -276,7 +291,7 @@ def image_command(message):
         description = args[1]
         
         # Show working message
-        working_msg = bot.reply_to(message, "🎨 يا إلهي! بشتغل على الصورة... بشوية ثواني بنخلصها! ✨")
+        bot.reply_to(message, "🎨 يا إلهي! بشتغل على الصورة... بشوية ثواني بنخلصها! ✨")
         
         # Generate image
         img_bytes, error = generate_image_from_text(description)
@@ -298,7 +313,10 @@ def image_command(message):
         
     except Exception as e:
         logger.error(f"❌ Error in image command: {str(e)}")
-        bot.reply_to(message, f"😤 خلل في إنشاء الصورة! جرب مرة ثانية!")
+        try:
+            bot.reply_to(message, f"😤 خلل في إنشاء الصورة! جرب مرة ثانية!")
+        except:
+            pass
 
 @bot.message_handler(commands=['tts'])
 def tts_command(message):
@@ -337,7 +355,10 @@ def tts_command(message):
         
     except Exception as e:
         logger.error(f"❌ Error in TTS command: {str(e)}")
-        bot.reply_to(message, "😤 خلل في الصوت! جرب مرة ثانية!")
+        try:
+            bot.reply_to(message, "😤 خلل في الصوت! جرب مرة ثانية!")
+        except:
+            pass
 
 @bot.message_handler(commands=['video'])
 def video_command(message):
@@ -367,7 +388,10 @@ def video_command(message):
         
     except Exception as e:
         logger.error(f"❌ Error in video command: {str(e)}")
-        bot.reply_to(message, "😤 خلل في الفيديو! جرب مرة ثانية!")
+        try:
+            bot.reply_to(message, "😤 خلل في الفيديو! جرب مرة ثانية!")
+        except:
+            pass
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
@@ -401,7 +425,10 @@ def help_command(message):
         logger.info(f"📖 Help command from user {message.from_user.id}")
     except Exception as e:
         logger.error(f"❌ Error in help command: {str(e)}")
-        bot.reply_to(message, "خلل تقني! 😤")
+        try:
+            bot.reply_to(message, "خلل تقني! 😤")
+        except:
+            pass
 
 @bot.message_handler(commands=['about'])
 def about_command(message):
@@ -441,7 +468,10 @@ def about_command(message):
         logger.info(f"ℹ️ About command from user {message.from_user.id}")
     except Exception as e:
         logger.error(f"❌ Error in about command: {str(e)}")
-        bot.reply_to(message, "خلل تقني! 😤")
+        try:
+            bot.reply_to(message, "خلل تقني! 😤")
+        except:
+            pass
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
@@ -471,13 +501,19 @@ def handle_message(message):
                     bot.reply_to(message, chunk, parse_mode='HTML')
                     time.sleep(0.5)  # Rate limiting
                 except:
-                    bot.reply_to(message, chunk)
+                    try:
+                        bot.reply_to(message, chunk)
+                    except:
+                        pass
         else:
             # Send single message
             try:
                 bot.reply_to(message, response, parse_mode='HTML')
             except:
-                bot.reply_to(message, response)
+                try:
+                    bot.reply_to(message, response)
+                except:
+                    pass
         
         logger.info(f"💬 Message from user {user_id} ({username}): {user_message[:50]}")
         
@@ -492,7 +528,7 @@ def handle_message(message):
         try:
             bot.reply_to(message, f"خلل تقني! ولك شو الحظ! 😤😂")
         except:
-            logger.error("Failed to send error message")
+            pass
 
 # ==================== HEALTH CHECK ====================
 
@@ -514,6 +550,7 @@ if __name__ == "__main__":
     logger.info("=" * 70)
     logger.info(f"Bot Token: {BOT_TOKEN[:20]}...{BOT_TOKEN[-10:]} (from TELEGRAM_TOKEN env var)")
     logger.info(f"Gemini API Key: {'✅ Configured' if GEMINI_API_KEY else '❌ Not Set'}")
+    logger.info(f"Environment: {'🌐 Render.com' if os.getenv('RENDER') else '💻 Local'}")
     logger.info("=" * 70)
     
     try:
