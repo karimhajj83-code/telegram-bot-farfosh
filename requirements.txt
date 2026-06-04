@@ -23,4 +23,3 @@ urllib3==2.1.0
 
 # Pydantic - Python 3.12 compatible version
 pydantic==2.6.4
-
